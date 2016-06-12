@@ -42,8 +42,8 @@ function renew_kronkorken() {
 	global $user_kronkorken, $db, $userid_to_use;
 
 	$user_kronkorken = array();
-	$sql = "SELECT * FROM bb1_sternburg_bingo_2016_user WHERE userid='" . $userid_to_use . "' ORDER BY number;";
-	$result = $db->unbuffered_query($sql);
+	$sql_query = "SELECT * FROM bb1_sternburg_bingo_2016_user WHERE userid='" . $userid_to_use . "' ORDER BY number;";
+	$result = $db->unbuffered_query($sql_query);
 	while ($row = mysqli_fetch_object($result)) {
 		$user_kronkorken[$row->number] = $row->number;
 	}
@@ -65,17 +65,17 @@ $error = "";
 
 if ($loggedin) {
 	//check is user is in DB
-	$sql = "SELECT * FROM bb1_sternburg_bingo_2016_user_publicfields WHERE userid='" . $wbbuserdata['userid'] . "'";
-	$result = $db->unbuffered_query($sql);
+	$sql_query = "SELECT * FROM bb1_sternburg_bingo_2016_user_publicfields WHERE userid='" . $wbbuserdata['userid'] . "'";
+	$result = $db->unbuffered_query($sql_query);
 	if (mysqli_num_rows($result) == 0) {
-		$sql = "INSERT INTO bb1_sternburg_bingo_2016_user_publicfields (`userid`, `public`) VALUES ('" . $wbbuserdata['userid'] . "', '0');";
-		$result = $db->unbuffered_query($sql);
+		$sql_query = "INSERT INTO bb1_sternburg_bingo_2016_user_publicfields (`userid`, `public`) VALUES ('" . $wbbuserdata['userid'] . "', '0');";
+		$result = $db->unbuffered_query($sql_query);
 	}
 
 	// Spielfelder freigeben
 	$field_links = '<a href="sternburg_bingo_2016.php?usefield=own">Meine Spielfelder</a>  | ';
-	$sql = "SELECT s.userid, username FROM bb1_sternburg_bingo_2016_user_publicfields s JOIN bb1_users u ON s.userid=u.userid WHERE s.public=1 AND s.userid <> '" . $wbbuserdata['userid'] . "'";
-	$result = $db->unbuffered_query($sql);
+	$sql_query = "SELECT s.userid, username FROM bb1_sternburg_bingo_2016_user_publicfields s JOIN bb1_users u ON s.userid=u.userid WHERE s.public=1 AND s.userid <> '" . $wbbuserdata['userid'] . "'";
+	$result = $db->unbuffered_query($sql_query);
 	while ($row = mysqli_fetch_object($result)) {
 		$field_links .= '<a href="sternburg_bingo_2016.php?usefield=' . $row->userid . '">Spielfelder von ' . $row->username . '</a> | ';
 	}
@@ -83,16 +83,16 @@ if ($loggedin) {
 
 	// toggle Freigabe
 	if (isset($_GET['toggle_freigabe']) && intval($_GET['toggle_freigabe']) == 1) {
-		$sql = "SELECT public FROM bb1_sternburg_bingo_2016_user_publicfields WHERE userid='" . $wbbuserdata['userid'] . "' LIMIT 1";
-		$result = $db->unbuffered_query($sql);
+		$sql_query = "SELECT public FROM bb1_sternburg_bingo_2016_user_publicfields WHERE userid='" . $wbbuserdata['userid'] . "' LIMIT 1";
+		$result = $db->unbuffered_query($sql_query);
 		while ($row = mysqli_fetch_object($result)) {
 			if ($row->public == 1) {
-				$sql = "UPDATE bb1_sternburg_bingo_2016_user_publicfields SET public=0 WHERE userid='" . $wbbuserdata['userid'] . "'";
+				$sql_query = "UPDATE bb1_sternburg_bingo_2016_user_publicfields SET public=0 WHERE userid='" . $wbbuserdata['userid'] . "'";
 			} else {
-				$sql = "UPDATE bb1_sternburg_bingo_2016_user_publicfields SET public=1 WHERE userid='" . $wbbuserdata['userid'] . "'";
+				$sql_query = "UPDATE bb1_sternburg_bingo_2016_user_publicfields SET public=1 WHERE userid='" . $wbbuserdata['userid'] . "'";
 			}
 		}
-		$db->unbuffered_query($sql);
+		$db->unbuffered_query($sql_query);
 	}
 
 	$already_in_use = false;
@@ -100,8 +100,8 @@ if ($loggedin) {
 	$canedit = false;
 
 	if (isset($_GET['usefield']) && trim($_GET['usefield']) != '') {
-		$sql = "SELECT username, s.userid, public FROM bb1_sternburg_bingo_2016_user_publicfields s JOIN bb1_users u ON s.userid=u.userid WHERE s.userid=" . intval($_GET['usefield']) . " LIMIT 1;";
-		$result = $db->unbuffered_query($sql);
+		$sql_query = "SELECT username, s.userid, public FROM bb1_sternburg_bingo_2016_user_publicfields s JOIN bb1_users u ON s.userid=u.userid WHERE s.userid=" . intval($_GET['usefield']) . " LIMIT 1;";
+		$result = $db->unbuffered_query($sql_query);
 		while ($row = mysqli_fetch_object($result)) {
 			if ($row->public == 1) {
 				$already_in_use = true;
@@ -121,8 +121,8 @@ if ($loggedin) {
 		$userid_to_use = $wbbuserdata['userid'];
 	}
 
-	$sql = "SELECT public FROM bb1_sternburg_bingo_2016_user_publicfields WHERE userid='" . $wbbuserdata['userid'] . "' LIMIT 1";
-	$result = $db->unbuffered_query($sql);
+	$sql_query = "SELECT public FROM bb1_sternburg_bingo_2016_user_publicfields WHERE userid='" . $wbbuserdata['userid'] . "' LIMIT 1";
+	$result = $db->unbuffered_query($sql_query);
 	while ($row = mysqli_fetch_object($result)) {
 		if ($row->public == 1) {
 			$my_field_public_is = "ist ";
@@ -137,12 +137,12 @@ if ($loggedin) {
 	// DEL-request?
 	if ($canedit && isset($_GET['action']) && trim($_GET['action']) == "del" && isset($_GET['number']) && intval($_GET['number']) != '') {
 		$number_to_del = intval(trim($_GET['number']));
-		$sql = "DELETE FROM bb1_sternburg_bingo_2016_user WHERE number='" . $number_to_del . "' && userid='" . $userid_to_use . "'";
-		$db->unbuffered_query($sql);
+		$sql_query = "DELETE FROM bb1_sternburg_bingo_2016_user WHERE number='" . $number_to_del . "' && userid='" . $userid_to_use . "'";
+		$db->unbuffered_query($sql_query);
 	} elseif ($canedit && isset($_POST['action']) && trim($_POST['action']) == "add" && isset($_POST['number']) && intval($_POST['number']) != '') {
 		$number_to_add = intval(trim($_POST['number']));
-		$sql = "INSERT INTO bb1_sternburg_bingo_2016_user (`userid`, `number`) VALUES ('" . $userid_to_use . "', '" . $number_to_add . "')";
-		$db->unbuffered_query($sql);
+		$sql_query = "INSERT INTO bb1_sternburg_bingo_2016_user (`userid`, `number`) VALUES ('" . $userid_to_use . "', '" . $number_to_add . "')";
+		$db->unbuffered_query($sql_query);
 	}
 
 	//find all Kronkorken, die der Nutzer schon hat
@@ -237,7 +237,7 @@ if ($loggedin) {
 		$klickhinweis = '';
 	}
 
-	$counter = 0;
+	$counter = -1;
 	foreach ($user_kronkorken as $key => $number) {
 		if ($counter++ == 8) {
 			$has_kronkorken .= "</div>";
